@@ -17,14 +17,15 @@ jobs:
               run: |
                   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                   unzip awscliv2.zip
-                  sudo ./aws/install --update
+                  sudo ./aws/install --bin-dir /usr/local/bin --update
                   aws --version
 
             - name: Configure AWS Credentials
-              run: |
-                  aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws configure set region ${{ secrets.AWS_REGION }}
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
 
             - name: Zip Application
               run: |
@@ -35,6 +36,24 @@ jobs:
                   TIMESTAMP=$(date +'%Y-%m-%d-%H-%M-%S')
                   aws s3 cp application.zip s3://${{ secrets.S3_BUCKET_NAME }}/app-$TIMESTAMP.zip
                   echo "ZIP_FILE=app-$TIMESTAMP.zip" >> $GITHUB_ENV
+
+            - name: Ensure Elastic Beanstalk Application Exists
+              run: |
+                  if ! aws elasticbeanstalk describe-applications --query "Applications[?ApplicationName=='MyNodeApp']" | grep -q 'MyNodeApp'; then
+                    aws elasticbeanstalk create-application --application-name MyNodeApp
+                  else
+                    echo "Application already exists."
+                  fi
+
+            - name: Ensure Elastic Beanstalk Environment Exists
+              run: |
+                  if ! aws elasticbeanstalk describe-environments --application-name MyNodeApp --query "Environments[?EnvironmentName=='MyNodeApp-env']" | grep -q 'MyNodeApp-env'; then
+                    aws elasticbeanstalk create-environment --application-name MyNodeApp \
+                      --environment-name MyNodeApp-env \
+                      --solution-stack-name "64bit Amazon Linux 2023 v3.0.1 running Node.js 18"
+                  else
+                    echo "Environment already exists."
+                  fi
 
             - name: Create New Application Version in Elastic Beanstalk
               run: |
