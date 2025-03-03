@@ -1,4 +1,4 @@
-name: Upload Application to S3
+name: Deploy Node.js App to Elastic Beanstalk
 
 on:
     push:
@@ -6,14 +6,14 @@ on:
             - main
 
 jobs:
-    upload:
+    deploy:
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
 
-            - name: Install or Update AWS CLI
+            - name: Install AWS CLI
               run: |
                   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                   unzip awscliv2.zip
@@ -34,3 +34,15 @@ jobs:
               run: |
                   TIMESTAMP=$(date +'%Y-%m-%d-%H-%M-%S')
                   aws s3 cp application.zip s3://${{ secrets.S3_BUCKET_NAME }}/app-$TIMESTAMP.zip
+                  echo "ZIP_FILE=app-$TIMESTAMP.zip" >> $GITHUB_ENV
+
+            - name: Create New Application Version in Elastic Beanstalk
+              run: |
+                  aws elasticbeanstalk create-application-version --application-name MyNodeApp \
+                    --version-label ${{ env.ZIP_FILE }} \
+                    --source-bundle S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=${{ env.ZIP_FILE }}
+
+            - name: Deploy New Version to Elastic Beanstalk
+              run: |
+                  aws elasticbeanstalk update-environment --environment-name MyNodeApp-env \
+                    --version-label ${{ env.ZIP_FILE }}
