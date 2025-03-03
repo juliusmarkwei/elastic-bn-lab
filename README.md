@@ -19,8 +19,8 @@ This project demonstrates how to deploy an Express application to AWS Elastic Be
 1. **Clone the repository:**
 
     ```bash
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/juliusmarkwei/elb-lab.git
+    cd elb-lab/
     ```
 
 2. **Install dependencies:**
@@ -32,7 +32,7 @@ This project demonstrates how to deploy an Express application to AWS Elastic Be
 3. **Run the application locally:**
 
     ```bash
-    npm start
+    npm run dev
     ```
 
     The server will start at `http://localhost:3000`.
