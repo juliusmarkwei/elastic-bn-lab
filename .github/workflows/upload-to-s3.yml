@@ -11,12 +11,14 @@ jobs:
 
         steps:
             - name: Checkout Repository
-              uses: actions/checkout@v4 # Get the latest code
+              uses: actions/checkout@v4
 
             - name: Install AWS CLI
               run: |
-                  sudo apt-get update
-                  sudo apt-get install -y awscli
+                  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                  unzip awscliv2.zip
+                  sudo ./aws/install
+                  aws --version
 
             - name: Configure AWS Credentials
               run: |
@@ -26,7 +28,7 @@ jobs:
 
             - name: Zip Application
               run: |
-                  zip -r application.zip . -x ".git/*"  # Exclude .git folder
+                  zip -r application.zip . -x ".git/*"
 
             - name: Upload Zip to S3
               run: |
