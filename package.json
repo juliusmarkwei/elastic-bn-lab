@@ -1,12 +1,4 @@
 {
-  "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.13.9",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
-    "typescipt": "^1.0.0",
-    "typescript": "^5.8.2"
-  },
   "dependencies": {
     "express": "^4.21.2"
   },
@@ -14,11 +6,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "module"
 }
