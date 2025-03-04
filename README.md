@@ -6,7 +6,7 @@ This project demonstrates how to deploy an Express application to AWS Elastic Be
 
 ```
 /src
-  └── index.ts
+  └── index.js
 ```
 
 ## Prerequisites
