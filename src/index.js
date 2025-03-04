@@ -1,11 +1,26 @@
 import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import orderRoutes from "./routes/orderRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
+
 app.get("/", (req, res) => {
-	res.json({ message: "Express + Elastic Beanstalk Deployment" });
+	res.json({
+		message:
+			"E-Commerce API Built and deployed with Express & Elastic Beanstalk Deployment",
+		routes: ["/api/products", "/api/orders"],
+	});
 });
+app.use("/api/products", orderRoutes);
+app.use("/api/orders", productRoutes);
 
 app.listen(PORT, () => {
 	console.log(`[server]: Server is running at http://localhost:${PORT}`);
